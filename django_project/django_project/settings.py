@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6*_28-a+!2wpqj1%ynmb2*+$*s*r4x72yk5_-djn=(&vio=aqp'
+SECRET_KEY = 'KyRH47nSENFNmz8112CPDVDG5GLNYoYzMd-aMx9VJpg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,19 +37,47 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     #Local
     'accounts.apps.AccountsConfig',
     'post.apps.PostConfig',
     
     #Thirdparty
     'rest_framework',
+    "rest_framework.authtoken",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'drf_spectacular',
 ]
 
 REST_FRAMEWORK = { # new
 "DEFAULT_PERMISSION_CLASSES": [
-"rest_framework.permissions.AllowAny",
+"rest_framework.permissions.IsAuthenticated",
 ],
+
+"DEFAULT_AUTHENTICATION_CLASSES": [
+"rest_framework.authentication.SessionAuthentication",
+"rest_framework.authentication.TokenAuthentication", # new
+],
+
+
+"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema"
+
+
+
 }
+
+
+SPECTACULAR_SETTINGS = {
+"TITLE": "Blog API Project",
+"DESCRIPTION": "A sample blog to learn about DRF",
+"VERSION": "1.0.0",
+# OTHER SETTINGS
+}
+
 
 
 MIDDLEWARE = [
@@ -75,10 +103,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
             ],
         },
     },
 ]
+
+EMAIL_BACKEND ='django.core.mail.backends.console.EmailBackend'
+SITE_ID = 1
 
 WSGI_APPLICATION = 'django_project.wsgi.application'
 
@@ -136,3 +168,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "accounts.CustomUser" 
+
+
+from environs import Env
+
+env = Env() # new
+env.read_env() # new
+
+SECRET_KEY = env.str("SECRET_KEY")
